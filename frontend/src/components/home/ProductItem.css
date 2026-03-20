@@ -1,0 +1,80 @@
+/* 전체 아이템은 가로(row)로 배치하고(Flex), 내용물이 꽉 차며 밑줄이 쳐지는 구조입니다. */
+.product-item {
+    display: flex;
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+    gap: 16px;
+    /* 이미지와 글씨 사이의 띄어쓰기(간격) 16px! (매우 중요한 최신 CSS 문법) */
+    background-color: var(--color-white);
+    cursor: pointer;
+}
+
+/* 1. 이미지 박스 영역 (당근마켓 특징: 둥근 모서리의 정사각형) */
+.product-image {
+    width: 108px;
+    height: 108px;
+    border-radius: 8px;
+    /* 모서리 둥글게 깎기 */
+    overflow: hidden;
+    /* 사진이 테두리를 삐져나가면 잘라냄 */
+    background-color: var(--color-bg-gray);
+    /* 사진 불러오기 전 회색 뼈대 */
+    flex-shrink: 0;
+    /* 글씨가 아무리 길어져도 사진 크기는 줄어들지 않도록 방어하는 속성! */
+}
+
+/* 이미지 태그 자체가 박스 사이즈에 꽉 차고 찌그러지지 않게 덮기 */
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 2. 텍스트 정보 영역 (이미지와 하트 사이에 위치, 세로로 차곡차곡 쌓임) */
+.product-info {
+    display: flex;
+    flex-direction: column;
+    /* 글씨들을 세로로 쌓기 */
+    flex: 1;
+    /* 이 영역이 남은 가로 공간을 다 밀고 차지합니다. */
+    justify-content: center;
+    /* 세로 기준 가운데 정렬 */
+    gap: 4px;
+    /* 글씨 줄 간의 간격 4px */
+}
+
+.product-title {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+    color: var(--color-text-main);
+    /* 글씨가 길면 '...' 으로 말줄임 처리하는 3세트 문법! */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-meta {
+    font-size: 13px;
+    color: var(--color-text-sub);
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-top: 4px;
+    /* 가격만 살짝 조금 더 띄우기 */
+}
+
+/* 3. 하트 아이템 영역 (우측 하단으로 짱박혀야 함) */
+.product-likes {
+    display: flex;
+    align-items: flex-end;
+    /* 아래(바닥)로 달라붙게 함 */
+}
+
+.likes-count {
+    font-size: 13px;
+    color: var(--color-text-sub);
+}

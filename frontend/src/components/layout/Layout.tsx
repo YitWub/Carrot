@@ -5,7 +5,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="layout">
       {/* 1. 상단 바 (Header) */}
       <header className="header">
-        <h1>동네 마켓</h1>
+        <h1>용원 마켓</h1>
       </header>
 
       {/* 2. 메인 콘텐츠: 실제 스크롤 되는 부분 */}
