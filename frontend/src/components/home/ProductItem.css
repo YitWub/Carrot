@@ -68,7 +68,7 @@
 }
 
 /* 3. 하트 아이템 영역 (우측 하단으로 짱박혀야 함) */
-.product-likes {
+.product-like {
     display: flex;
     align-items: flex-end;
     /* 아래(바닥)로 달라붙게 함 */
