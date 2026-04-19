@@ -1,0 +1,32 @@
+/* src/pages/Home.css */
+.home-container {
+    padding-bottom: 80px; /* 플로팅 버튼이 가리지 않게 하단 여백 추가 */
+    position: relative;
+    min-height: 100%;
+}
+
+.floating-button {
+    position: fixed;
+    bottom: 80px; /* 하단 네비게이션(60px) 위쪽에 위치하도록 */
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--color-primary); /* 주황색 */
+    color: white;
+    border-radius: 50%; /* 완전한 동그라미 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    border: none;
+    z-index: 100; /* 상품 목록보다 항상 위에! */
+    transition: transform 0.2s;
+}
+
+.floating-button:hover {
+    transform: scale(1.1); /* 누를 때 살짝 커지게 */
+    background-color: #e66a20;
+}

@@ -1,7 +1,9 @@
 import './ProductItem.css';
+import { useNavigate } from 'react-router-dom';
 
 // ProductItem이 밖에서 어떤 속성들을 전달받을수 있는지
 interface ProductItemProps {
+    id: number;
     imageSrc: string; // 상품 사진 주소
     title: string; // 상품 제목
     location: string; // 동네 이름
@@ -10,9 +12,11 @@ interface ProductItemProps {
     likes: number // 좋아요 수
 }
 
-export default function ProductItem({ imageSrc, title, location, timeAgo, price, likes }: ProductItemProps) {
+export default function ProductItem({ id, imageSrc, title, location, timeAgo, price, likes }: ProductItemProps) {
+    const navigate = useNavigate(); //페이지 이동...??
+
     return (
-        <div className="product-item">
+        <div className="product-item" onClick={() => navigate(`/products/${id}`)}>
             {/* 1. 상품 이미지 영역*/}
             <div className="product-image">
                 { /* 현업기준 실제 사진 없으면 보통 회색 빈칸*/}
