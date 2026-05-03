@@ -21,7 +21,7 @@ export default function Chat() {
             return;
         }
 
-        fetch(`http://localhost:8080/api/chat/my-rooms?userId=${myUserId}`)
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/my-rooms?userId=${myUserId}`)
             .then(res => res.json())
             .then(data => {
                 setRooms(data);

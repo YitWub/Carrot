@@ -22,7 +22,7 @@ export default function ChatDetail() {
 
     // 1. 메시지 조회 (Polling)
     const fetchMessages = () => {
-        fetch(`http://localhost:8080/api/chat/room/${roomId}`)
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/room/${roomId}`)
             .then(res => res.json())
             .then(data => {
                 setMessages(data);
@@ -45,7 +45,7 @@ export default function ChatDetail() {
     const handleSend = () => {
         if (!inputText.trim()) return;
 
-        fetch(`http://localhost:8080/api/chat/message?roomId=${roomId}&senderId=${myUserId}`, {
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/message?roomId=${roomId}&senderId=${myUserId}`, {
             method: "POST",
             body: inputText
         })

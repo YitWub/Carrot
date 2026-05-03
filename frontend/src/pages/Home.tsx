@@ -16,7 +16,7 @@ export default function Home() {
     const navigate = useNavigate(); // 페이지 이동을 위한 도구 추가!
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/products')
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/products`)
             .then((response) => response.json())
             .then((data) => {
                 console.log("백엔드에서 데이터가 왔어요!!", data);
@@ -33,7 +33,7 @@ export default function Home() {
                     id={product.id}
                     title={product.title}
                     price={product.price} 
-                    imageSrc={product.imageUrl ? `http://localhost:8080/uploads/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"}
+                    imageSrc={product.imageUrl ? `${import.meta.env.VITE_UPLOADS_BASE_URL}/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"}
                     location="우리 동네"
                     timeAgo="방금 전"
                     likes={0}

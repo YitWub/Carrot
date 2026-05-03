@@ -19,7 +19,7 @@ export default function ProductDetail() {
     const [product, setProduct] = useState<Product | null>(null);
     useEffect(() => {
         // 서버에게 "이 아이디(id)의 상품 하나만 갖다줘!" 라고 요청
-        fetch(`http://localhost:8080/api/products/${id}`)
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/products/${id}`)
             .then(res => res.json())
             .then(data => {
                 setProduct(data);
@@ -31,7 +31,7 @@ export default function ProductDetail() {
     return (
         <div className="detail-container">
             <img 
-                src={product.imageUrl ? `http://localhost:8080/uploads/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"} 
+                src={product.imageUrl ? `${import.meta.env.VITE_UPLOADS_BASE_URL}/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"} 
                 alt="상품 이미지" 
                 className="detail-image" 
             />
@@ -60,7 +60,7 @@ export default function ProductDetail() {
                             return;
                         }
                         // 채팅방 생성/조회 API 호출
-                        fetch(`http://localhost:8080/api/chat/room?productId=${product.id}&buyerId=${myUserId}`, {
+                        fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/room?productId=${product.id}&buyerId=${myUserId}`, {
                             method: "POST"
                         })
                         .then(res => res.json())
