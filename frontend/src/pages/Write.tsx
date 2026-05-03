@@ -30,7 +30,7 @@ export default function Write() {
             formData.append("image", image);
         }
 
-        fetch('http://localhost:8080/api/products', {
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/products`, {
             method: 'POST',
             // headers의 Content-Type은 브라우저가 알아서 넣어주도록 생략해야 합니다!
             body: formData

@@ -4,7 +4,7 @@ import com.carrot.backend.domain.User;
 import com.carrot.backend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${cors.allowed-origins}")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {

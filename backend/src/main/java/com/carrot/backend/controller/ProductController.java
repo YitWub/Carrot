@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${cors.allowed-origins}")
 @RestController // "나는 프론트엔드랑 소통하는 API 안내데스크(웨이터)야!" 라는 포스트잇
 @RequestMapping("/api/products") // 웹 주소가 "/api/products" 로 들어올 때 담당
 public class ProductController {

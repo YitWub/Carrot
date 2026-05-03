@@ -21,7 +21,7 @@ export default function Profile() {
 
     const handleLogin = () => {
         // 이메일 기반 로그인 요청
-        fetch(`http://localhost:8080/api/users/login?email=${emailInput}`)
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/users/login?email=${emailInput}`)
             .then(res => {
                 if (!res.ok) throw new Error("없는 이메일입니다.");
                 return res.json();
