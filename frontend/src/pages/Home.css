@@ -17,7 +17,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 32px;
+    line-height: 0; /* 글씨 높이로 인한 치우침 해결 */
+    padding-bottom: 4px; /* 폰트 특성상 살짝 위로 올라가는 현상 미세 보정 */
+    font-size: 36px; /* 크기도 살짝 보기 좋게 키움 */
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     cursor: pointer;
