@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../firebase";
 
 interface User {
     id: number;
@@ -7,10 +9,8 @@ interface User {
 }
 
 export default function Profile() {
-    const [emailInput, setEmailInput] = useState("");
     const [user, setUser] = useState<User | null>(null);
 
-    // 로컬 스토리지에서 사용자 정보 로드
     useEffect(() => {
         const savedUserId = localStorage.getItem("userId");
         const savedUserNickname = localStorage.getItem("userNickname");
@@ -19,21 +19,34 @@ export default function Profile() {
         }
     }, []);
 
-    const handleLogin = () => {
-        // 이메일 기반 로그인 요청
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/users/login?email=${emailInput}`)
-            .then(res => {
-                if (!res.ok) throw new Error("없는 이메일입니다.");
-                return res.json();
-            })
-            .then(data => {
-                alert(`환영합니다, ${data.nickname}님!`);
-                setUser(data);
-                // 로컬 스토리지에 사용자 정보 저장
-                localStorage.setItem("userId", data.id);
-                localStorage.setItem("userNickname", data.nickname);
-            })
-            .catch(error => alert(error.message));
+    const handleGoogleLogin = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const userEmail = result.user.email;
+            const userNickname = result.user.displayName;
+
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/auth`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: userEmail, nickname: userNickname }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Server communication failed");
+            }
+
+            const data = await response.json();
+            alert(`환영합니다, ${data.nickname}님!`);
+            setUser(data);
+            localStorage.setItem("userId", data.id);
+            localStorage.setItem("userNickname", data.nickname);
+
+        } catch (error: any) {
+            console.error(error.message);
+        }
     };
 
     const handleLogout = () => {
@@ -47,25 +60,32 @@ export default function Profile() {
         <div style={{ padding: "20px" }}>
             <h2>나의 당근</h2>
 
-            {/* 미로그인 상태 UI */}
             {!user ? (
                 <div>
-                    <p>로그인을 진행해 주세요.</p>
-                    <input
-                        type="text"
-                        placeholder="이메일을 입력하세요 (ex: carrot1@test.com)"
-                        value={emailInput}
-                        onChange={(e) => setEmailInput(e.target.value)}
-                        style={{ width: "80%", padding: "10px", marginBottom: "10px" }}
-                    />
-                    <br />
-                    <button onClick={handleLogin} style={{ padding: "10px 20px" }}>로그인</button>
-                    <p style={{ marginTop: "20px", fontSize: "14px", color: "gray" }}>
-                        가짜 유저 목록: carrot1@test.com(당근이), carrot2@test.com(토끼)
-                    </p>
+                    <p>당근마켓에 오신 것을 환영합니다!</p>
+                    <button
+                        onClick={handleGoogleLogin}
+                        style={{
+                            padding: "12px 24px",
+                            backgroundColor: "#4285F4",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            fontSize: "16px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px"
+                        }}>
+                        <img
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google"
+                            style={{ width: "24px", height: "24px", backgroundColor: "white", padding: "2px", borderRadius: "2px" }}
+                        />
+                        Google 계정으로 계속하기
+                    </button>
                 </div>
             ) : (
-                /* 로그인 상태 UI */
                 <div>
                     <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px", marginBottom: "20px" }}>
                         <div style={{ fontSize: "24px", fontWeight: "bold" }}>🥕 {user.nickname}님</div>

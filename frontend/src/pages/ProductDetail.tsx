@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './ProductDetail.css';
 
 // 불러올 데이터?
@@ -14,6 +14,7 @@ interface Product {
 export default function ProductDetail() {
 
     const { id } = useParams(); //이게 좋대
+    const navigate = useNavigate();
 
     // 상품정보 저장
     const [product, setProduct] = useState<Product | null>(null);
@@ -30,10 +31,10 @@ export default function ProductDetail() {
     if (!product) return <div style={{ padding: '20px' }}>상품 정보를 불러오는 중입니다...</div>;
     return (
         <div className="detail-container">
-            <img 
-                src={product.imageUrl ? `${import.meta.env.VITE_UPLOADS_BASE_URL}/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"} 
-                alt="상품 이미지" 
-                className="detail-image" 
+            <img
+                src={product.imageUrl ? `${import.meta.env.VITE_UPLOADS_BASE_URL}/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"}
+                alt="상품 이미지"
+                className="detail-image"
             />
 
             <div className="detail-content">
@@ -50,9 +51,9 @@ export default function ProductDetail() {
                 <div className="detail-info">방금 전</div>
                 <div className="detail-price">{product.price.toLocaleString()}원</div>
                 <div className="detail-description">{product.content}</div>
-                
+
                 {/* 채팅하기 버튼 */}
-                <button 
+                <button
                     onClick={() => {
                         const myUserId = localStorage.getItem("userId");
                         if (!myUserId) {
@@ -63,16 +64,21 @@ export default function ProductDetail() {
                         fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/room?productId=${product.id}&buyerId=${myUserId}`, {
                             method: "POST"
                         })
-                        .then(res => res.json())
-                        .then(room => {
-                            // 채팅방으로 라우팅
-                            window.location.href = `/chat/${room.id}`; 
-                        })
-                        .catch(err => alert("채팅방을 열 수 없어요."));
+                            .then(res => {
+                                if (!res.ok) {
+                                    throw new Error("Failed to create room");
+                                }
+                                return res.json();
+                            })
+                            .then(room => {
+                                // 채팅방으로 라우팅
+                                navigate(`/chat/${room.id}`);
+                            })
+                            .catch(() => alert("채팅방을 열 수 없어요."));
                     }}
                     style={{
-                        width: '100%', padding: '15px', backgroundColor: 'var(--color-primary)', 
-                        color: 'white', border: 'none', borderRadius: '8px', 
+                        width: '100%', padding: '15px', backgroundColor: 'var(--color-primary)',
+                        color: 'white', border: 'none', borderRadius: '8px',
                         fontWeight: 'bold', fontSize: '16px', marginTop: '20px', cursor: 'pointer'
                     }}
                 >

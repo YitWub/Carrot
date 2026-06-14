@@ -20,6 +20,11 @@ export default function Write() {
             return;
         }
 
+        if (Number(price) < 0) {
+            alert("가격은 0원 이상이어야 합니다.");
+            return;
+        }
+
         // 이미지 파일 포함을 위해 FormData 사용
         const formData = new FormData();
         formData.append("title", title);
@@ -36,11 +41,11 @@ export default function Write() {
             body: formData
         })
             .then((response) => response.json())
-            .then((data) => {
+            .then(() => {
                 alert('글을 성공적으로 올렸어요!');
                 navigate('/');
             })
-            .catch((error) => alert('앗! 글 작성에 실패했어요.'));
+            .catch(() => alert('앗! 글 작성에 실패했어요.'));
     };
 
     return (
@@ -71,6 +76,7 @@ export default function Write() {
                     className="input-field"
                     placeholder="₩ 가격 (선택사항)"
                     value={price}
+                    min="0"
                     onChange={(e) => setPrice(e.target.value)}
                 />
                 <textarea
