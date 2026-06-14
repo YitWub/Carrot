@@ -15,10 +15,22 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    // 누군가 "api/users/login?email=xxx" 이렇게 물어보면 실행! ???
     @GetMapping("/login")
     public User login(@RequestParam String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
+    }
+
+    @PostMapping("/auth")
+    public User googleAuth(@RequestBody java.util.Map<String, String> userData) {
+        String email = userData.get("email");
+        String nickname = userData.get("nickname");
+
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setNickname(nickname != null ? nickname : "당근유저");
+            return userRepository.save(newUser);
+        });
     }
 }

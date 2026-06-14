@@ -32,8 +32,8 @@ export default function ChatDetail() {
 
     // 2. 초기 로드 및 Polling 설정
     useEffect(() => {
-        fetchMessages(); 
-        
+        fetchMessages();
+
         const intervalId = setInterval(() => {
             fetchMessages();
         }, 2000);
@@ -49,11 +49,11 @@ export default function ChatDetail() {
             method: "POST",
             body: inputText
         })
-        .then(() => {
-            setInputText("");
-            fetchMessages(); 
-        })
-        .catch(err => alert("전송 실패"));
+            .then(() => {
+                setInputText("");
+                fetchMessages();
+            })
+            .catch(() => alert("전송 실패"));
     };
 
     // 4. 새 메시지 수신 시 자동 스크롤
@@ -81,10 +81,10 @@ export default function ChatDetail() {
 
             {/* 입력창 영역 */}
             <div className="chat-input-area">
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     className="chat-input"
-                    placeholder="메시지를 입력하세요" 
+                    placeholder="메시지를 입력하세요"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}

@@ -32,7 +32,7 @@ export default function Home() {
                     key={product.id}
                     id={product.id}
                     title={product.title}
-                    price={product.price} 
+                    price={product.price}
                     imageSrc={product.imageUrl ? `${import.meta.env.VITE_UPLOADS_BASE_URL}/${product.imageUrl}` : "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&q=80"}
                     location="우리 동네"
                     timeAgo="방금 전"

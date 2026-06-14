@@ -26,6 +26,7 @@
 /* 꽉 차고 스크롤되도록 */
 .main-content {
   flex: 1;
+  min-height: 0;
   /* 남은공간 모두 차지 */
   overflow-y: auto;
   /* 내용이 넘치면 새로 스크롤 생성? */

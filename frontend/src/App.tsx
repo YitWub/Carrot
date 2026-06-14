@@ -31,7 +31,7 @@ function App() {
         {/* 주소가 /products/숫자 일 때는 <ProductDetail>을 돌려줘라 */}
         {/* 콜론(:)은 이 자리에 어떠한 숫자나 문자가 들어와도 그 값 자체를 변수(id)로 쓰겠다는 의미입니다! */}
         <Route path="/products/:id" element={<ProductDetail />} /> {/*뭐임 이건*/}
-        
+
         {/* 주소가 /chat/방번호 일 때 들어가는 진짜 채팅창 */}
         <Route path="/chat/:roomId" element={<ChatDetail />} />
 

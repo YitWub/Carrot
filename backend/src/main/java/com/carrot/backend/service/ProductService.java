@@ -35,11 +35,15 @@ public class ProductService {
         User realUser = userRepository.findById(sellerId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
+        if (price != null && price < 0) {
+            throw new IllegalArgumentException("가격은 0원 이상이어야 합니다.");
+        }
+
         Product newProduct = new Product();
         newProduct.setTitle(title);
         newProduct.setContent(content);
         newProduct.setPrice(price);
-        newProduct.setSeller(realUser); 
+        newProduct.setSeller(realUser);
 
         // 이미지 처리 로직
         if (image != null && !image.isEmpty()) {

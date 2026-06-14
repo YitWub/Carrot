@@ -37,13 +37,13 @@ export default function Chat() {
     return (
         <div style={{ padding: "20px" }}>
             <h2 style={{ paddingBottom: "10px", borderBottom: "1px solid #ddd" }}>채팅방 목록</h2>
-            
+
             {rooms.length === 0 ? (
                 <p>진행 중인 채팅이 없습니다.</p>
             ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "15px", marginTop: "15px" }}>
                     {rooms.map((room: ChatRoom) => (
-                        <div 
+                        <div
                             key={room.id}
                             style={{ padding: "15px", border: "1px solid #eee", borderRadius: "10px", cursor: "pointer" }}
                             onClick={() => navigate(`/chat/${room.id}`)}

@@ -1,0 +1,53 @@
+type User @table {
+  displayName: String!
+  email: String
+  photoUrl: String
+  createdAt: Timestamp!
+}
+
+type PantryItem @table {
+  user: User!
+  name: String!
+  quantity: Float!
+  unit: String!
+  expirationDate: Date!
+  notes: String
+  createdAt: Timestamp!
+}
+
+type Recipe @table {
+  user: User
+  name: String!
+  description: String
+  instructions: String!
+  prepTime: Int
+  cookTime: Int
+  servings: Int
+  createdAt: Timestamp!
+}
+
+type RecipeIngredient @table {
+  recipe: Recipe!
+  ingredientName: String!
+  quantity: Float!
+  unit: String!
+  notes: String
+}
+
+type MealPlanEntry @table {
+  user: User!
+  recipe: Recipe!
+  mealDate: Date!
+  notes: String
+  createdAt: Timestamp!
+}
+
+type ShoppingListItem @table {
+  user: User!
+  itemName: String!
+  quantity: Float!
+  unit: String!
+  isPurchased: Boolean!
+  notes: String
+  createdAt: Timestamp!
+}
