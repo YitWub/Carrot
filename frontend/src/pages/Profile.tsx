@@ -57,41 +57,66 @@ export default function Profile() {
     };
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>나의 당근</h2>
+        <div style={{ padding: "30px 20px", display: "flex", flexDirection: "column", gap: "24px" }}>
+            <h2 style={{ margin: 0 }}>나의 당근</h2>
 
             {!user ? (
-                <div>
-                    <p>당근마켓에 오신 것을 환영합니다!</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <p style={{ margin: 0, fontSize: "16px", color: "#333" }}>당근마켓에 오신 것을 환영합니다!</p>
                     <button
                         onClick={handleGoogleLogin}
                         style={{
                             padding: "12px 24px",
-                            backgroundColor: "#4285F4",
+                            backgroundColor: "#ff7e36",
                             color: "white",
                             border: "none",
-                            borderRadius: "5px",
+                            borderRadius: "8px",
                             fontSize: "16px",
+                            fontWeight: "bold",
                             cursor: "pointer",
-                            display: "flex",
+                            display: "inline-flex",
                             alignItems: "center",
-                            gap: "10px"
+                            justifyContent: "center",
+                            gap: "12px",
+                            width: "fit-content",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
                         }}>
-                        <img
-                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                            alt="Google"
-                            style={{ width: "24px", height: "24px", backgroundColor: "white", padding: "2px", borderRadius: "2px" }}
-                        />
+                        <div style={{ 
+                            backgroundColor: "white", 
+                            borderRadius: "50%", 
+                            width: "28px", 
+                            height: "28px", 
+                            display: "flex", 
+                            alignItems: "center", 
+                            justifyContent: "center" 
+                        }}>
+                            <img
+                                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                alt="Google"
+                                style={{ width: "18px", height: "18px" }}
+                            />
+                        </div>
                         Google 계정으로 계속하기
                     </button>
                 </div>
             ) : (
-                <div>
-                    <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px", marginBottom: "20px" }}>
-                        <div style={{ fontSize: "24px", fontWeight: "bold" }}>🥕 {user.nickname}님</div>
-                        <div style={{ color: "gray" }}>당근마켓과 함께한 지 N일째</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <div style={{ padding: "20px", border: "1px solid #eee", borderRadius: "10px", backgroundColor: "#f9f9f9" }}>
+                        <div style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "8px" }}>🥕 {user.nickname}님</div>
+                        <div style={{ color: "gray", fontSize: "14px" }}>당근마켓과 함께한 지 N일째</div>
                     </div>
-                    <button onClick={handleLogout} style={{ padding: "10px 20px" }}>로그아웃</button>
+                    <button 
+                        onClick={handleLogout} 
+                        style={{ 
+                            padding: "10px 20px",
+                            backgroundColor: "#f1f1f1",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            width: "fit-content"
+                        }}>
+                        로그아웃
+                    </button>
                 </div>
             )}
         </div>
