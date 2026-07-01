@@ -5,6 +5,19 @@ Vite(React) + Spring Boot(Java) 기반의 당근마켓 클론 코딩 프로젝�
 
 ---
 
+## 📋 프로젝트 방법론 (Methodology)
+
+이 프로젝트는 **Hyper-Waterfall** 방법론을 채택하여 관리됩니다.
+- 거시적인 작업 계획과 아키텍처는 체계적인 문서(워터폴)로 남깁니다.
+- 실제 기능 구현과 테스트는 AI의 도움을 받아 아주 짧은 주기로 빠르게 실행(애자일)합니다.
+- 모든 진행 내역은 커밋 메시지에만 의존하지 않고, `mydocs/` 폴더 내에 투명하게 기록됩니다.
+  - `mydocs/orders/` : 할 일(Task) 목록
+  - `mydocs/plans/` : 기획 및 구현 계획서
+  - `mydocs/working/` : 작업 진행 상태 및 결과 보고서 (`task_N_final.md`)
+  - `mydocs/feedback/` : 리뷰 및 버그 피드백
+
+---
+
 ## 🛠️ 기술 스택 (Tech Stack)
 
 | 구분 | 기술 스택 | 상세 역할 |
