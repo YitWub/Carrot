@@ -137,6 +137,23 @@ pg_dump -U yongwon -d carrot -f carrot_backup.sql
            try_files $uri $uri/ /index.html; # React SPA 라우팅 지원
        }
 
+       # SPA의 HTML 파일은 브라우저 캐시 무효화 (항상 최신 버전 로드)
+       location ~* \.html$ {
+           root /var/www/html;
+           add_header Cache-Control "no-store, no-cache, must-revalidate";
+           add_header Pragma "no-cache";
+           add_header Expires 0;
+           try_files $uri =404;
+       }
+
+       # JS, CSS 등 정적 자원은 캐시 허용
+       location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+           root /var/www/html;
+           expires max;
+           add_header Cache-Control "public, max-age=31536000, immutable";
+           try_files $uri =404;
+       }
+
        # 2. 백엔드 API 요청 리버스 프록시
        location /api/ {
            proxy_pass http://localhost:9000; # 실행 중인 스프링 부트 서버 포트
