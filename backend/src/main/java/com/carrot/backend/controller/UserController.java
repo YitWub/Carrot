@@ -1,36 +1,44 @@
 package com.carrot.backend.controller;
 
-import com.carrot.backend.domain.User;
-import com.carrot.backend.repository.UserRepository;
+import com.carrot.backend.dto.UserProfileResponse;
+import com.carrot.backend.dto.UserProfileUpdateRequest;
+import com.carrot.backend.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "${cors.allowed-origins}")
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/login")
-    public User login(@RequestParam String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponse> getMyProfile(@RequestHeader("X-User-Id") Long userId) {
+        UserProfileResponse response = userService.getUserProfile(userId);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/auth")
-    public User googleAuth(@RequestBody java.util.Map<String, String> userData) {
-        String email = userData.get("email");
-        String nickname = userData.get("nickname");
+    @PutMapping("/me")
+    public ResponseEntity<UserProfileResponse> updateMyProfile(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody UserProfileUpdateRequest request) {
+        
+        try {
+            UserProfileResponse response = userService.updateUserProfile(userId, request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-        return userRepository.findByEmail(email).orElseGet(() -> {
-            User newUser = new User();
-            newUser.setEmail(email);
-            newUser.setNickname(nickname != null ? nickname : "당근유저");
-            return userRepository.save(newUser);
-        });
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyProfile(@RequestHeader("X-User-Id") Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }

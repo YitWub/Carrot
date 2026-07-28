@@ -1,43 +1,55 @@
-import { Routes, Route } from 'react-router-dom'
-import Layout from './components/layout/Layout'
-import './App.css'
-import ProductDetail from './pages/ProductDetail'
-import ChatDetail from './pages/ChatDetail' // 👈 요기 추가!
-import Home from './pages/Home'
-import Chat from './pages/Chat'
-import Profile from './pages/Profile'
-import Write from './pages/Write' // 새로 만든 글쓰기 페이지 옷장(컴포넌트) 가져오기!
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { LoginPage } from './pages/LoginPage';
+import { MyPage } from './pages/MyPage';
+import { MobileLayout } from './components/layout/MobileLayout';
+import { useAuthStore } from './store/useAuthStore';
+
+import { HomePage } from './pages/HomePage';
+import ProductDetail from './pages/ProductDetail';
+import Write from './pages/Write';
+
+// 임시 채팅 페이지
+const ChatPage = () => (
+  <div className="p-4">
+    <h1 className="text-2xl font-bold mb-4">채팅</h1>
+    <p>채팅 리스트 구현 예정...</p>
+  </div>
+);
 
 function App() {
+  const { isLoggedIn } = useAuthStore();
+
   return (
-    <Layout>
+    <div className="mx-auto w-full max-w-[480px] h-screen bg-white shadow-2xl overflow-hidden relative flex flex-col">
       {/* 
-        여기가 마법의 스위치 구역(Routes)입니다!
-        인터넷 주소(path)에 따라서 알맞은 부품(element)을 툭 얹어줍니다.
+        모바일 뷰를 시뮬레이션하기 위해
+        최대 너비를 모바일 사이즈로 제한하고 중앙 정렬
       */}
       <Routes>
-        {/* 주소가 맨 처음 기본 주소(/)일 때는 <Home>을 돌려줘라 */}
-        <Route path="/" element={<Home />} />
+        {/* 로그인되지 않은 경우 볼 수 있는 화면 */}
+        <Route 
+          path="/login" 
+          element={isLoggedIn ? <Navigate to="/" replace /> : <LoginPage />} 
+        />
 
-        {/* 주소가 /chat 일 때는 <Chat>을 돌려줘라 */}
-        <Route path="/chat" element={<Chat />} />
+        {/* 로그인된 사용자만 접근할 수 있는 라우트 그룹 */}
+        <Route
+          element={isLoggedIn ? <MobileLayout /> : <Navigate to="/login" replace />}
+        >
+          <Route path="/" element={<HomePage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/mypage" element={<MyPage />} />
+        </Route>
 
-        {/* 주소가 /profile 일 때는 <Profile>을 돌려줘라 */}
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/product/:id" element={isLoggedIn ? <ProductDetail /> : <Navigate to="/login" replace />} />
+        <Route path="/write" element={isLoggedIn ? <Write /> : <Navigate to="/login" replace />} />
 
-        {/* 주소가 /write 일 때는 <Write>를 돌려줘라 */}
-        <Route path="/write" element={<Write />} />
-
-        {/* 주소가 /products/숫자 일 때는 <ProductDetail>을 돌려줘라 */}
-        {/* 콜론(:)은 이 자리에 어떠한 숫자나 문자가 들어와도 그 값 자체를 변수(id)로 쓰겠다는 의미입니다! */}
-        <Route path="/products/:id" element={<ProductDetail />} /> {/*뭐임 이건*/}
-
-        {/* 주소가 /chat/방번호 일 때 들어가는 진짜 채팅창 */}
-        <Route path="/chat/:roomId" element={<ChatDetail />} />
-
+        {/* 알 수 없는 경로는 홈으로 리다이렉트 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Layout>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
