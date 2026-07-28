@@ -1,16 +1,19 @@
+@import "tailwindcss";
+
 :root {
-  /* 당근카멧 케인 컬러 시스템 */
-  --color-primary: #FF7E36;
-  --color-primary-dark: #E66B2A;
+  /* 당근마켓 메인 컬러 시스템 */
+  --carrot-primary: #FF7E36;
+  --carrot-hover: #E66A2C;
+  --carrot-bg: #FDF9F6;
+  
+  /* 피그마 베이스 컬러 */
+  --header-bg: #F3B5B5; 
 
   /* 회색 계열 */
   --color-text-main: #212124;
   --color-text-sub: #868B94;
   --color-bg-gray: #F5F5F5;
   --color-border: #EAEBEE;
-
-  /* 기타 */
-  --color-white: #FFFFFF;
 }
 
 /* 모든 요소에 적용될 기본 설정 초기화(Reset CSS) */
@@ -21,7 +24,7 @@
 }
 
 body {
-  font-family: -apple-system, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--color-text-main);
   background-color: var(--color-bg-gray);
   /* 모바일 앱처럼 가운데 정렬된 모바일 사이즈 뷰를 만들기 위한 기본 바탕 */
@@ -34,8 +37,9 @@ body {
 #root {
   width: 100%;
   max-width: 480px;
-  background-color: var(--color-white);
+  background-color: white;
   min-height: 100vh;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   position: relative;
+  overflow-x: hidden;
 }

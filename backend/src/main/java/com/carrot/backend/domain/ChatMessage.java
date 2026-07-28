@@ -58,4 +58,14 @@ public class ChatMessage {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    private boolean isRead = false;
+
+    public boolean getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(boolean isRead) {
+        this.isRead = isRead;
+    }
 }
