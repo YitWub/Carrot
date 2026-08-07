@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Plus } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { apiClient, UPLOADS_URL } from '../api/client';
 import { formatPrice } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
@@ -16,32 +16,27 @@ interface Product {
   createdAt: string;
 }
 
-export const HomePage: React.FC = () => {
+export const MyProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProducts();
+    fetchMyProducts();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchMyProducts = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get('/api/v1/products', {
-        params: { keyword: searchKeyword }
-      });
-      setProducts(res.data.content);
+      const res = await apiClient.get('/api/v1/users/me/products');
+      setProducts(res.data.content || []);
     } catch (error) {
-      console.error('Failed to fetch products', error);
+      console.error('Failed to fetch my products', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // 11분 전 같은 시간 포맷팅 함수
   const timeAgo = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
@@ -57,41 +52,13 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col bg-[#F8F9FA] relative overflow-hidden">
-      <div className="flex-1 flex flex-col bg-white relative overflow-hidden rounded-t-[30px] shadow-sm">
+      <div className="flex-1 flex flex-col bg-white relative overflow-hidden shadow-sm">
         {/* 상단 헤더 */}
-        <header className="flex items-center justify-between px-[17px] h-[48px] bg-white shrink-0 border-b border-gray-100">
-          {isSearching ? (
-            <div className="flex flex-1 items-center gap-2 bg-gray-100 rounded-lg px-3 py-1.5 mr-2">
-              <Search size={18} className="text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="어떤 상품을 찾으시나요?" 
-                className="bg-transparent border-none outline-none text-sm w-full"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && fetchProducts()}
-                autoFocus
-              />
-            </div>
-          ) : (
-            <div className="flex items-center gap-1 cursor-pointer">
-              <h1 className="text-xl font-bold text-black ml-1">용원마켓</h1>
-            </div>
-          )}
-          <div className="flex items-center gap-3">
-            <button onClick={() => {
-              if (isSearching && searchKeyword) {
-                fetchProducts();
-              } else if (isSearching && !searchKeyword) {
-                setIsSearching(false);
-                fetchProducts();
-              } else {
-                setIsSearching(true);
-              }
-            }}>
-              <Search size={24} className="text-black cursor-pointer" />
-            </button>
-          </div>
+        <header className="flex items-center px-[17px] h-[57px] bg-white border-b border-gray-100 shrink-0 sticky top-0 z-10">
+          <button onClick={() => navigate(-1)} className="p-1 -ml-1">
+            <ChevronLeft size={28} className="text-black" />
+          </button>
+          <h1 className="text-[18px] font-bold text-black ml-2">내가 쓴 글</h1>
         </header>
 
         {/* 상품 리스트 영역 */}
@@ -99,7 +66,7 @@ export const HomePage: React.FC = () => {
           {loading ? (
             <div className="flex justify-center items-center h-full text-gray-500">불러오는 중...</div>
           ) : products.length === 0 ? (
-            <div className="flex justify-center items-center h-full text-gray-500">등록된 상품이 없습니다.</div>
+            <div className="flex justify-center items-center h-full text-gray-500">등록한 상품이 없습니다.</div>
           ) : (
             <div className="flex flex-col">
               {products.map((product) => (
@@ -109,7 +76,7 @@ export const HomePage: React.FC = () => {
                   onClick={() => navigate(`/product/${product.productId}`)}
                 >
                   {/* 썸네일 */}
-                  <div className="w-[112px] h-[112px] bg-[#d9d9d9] rounded-[10px] overflow-hidden shrink-0 flex flex-col items-center justify-center">
+                  <div className="w-[112px] h-[112px] bg-[#d9d9d9] rounded-[10px] overflow-hidden shrink-0 flex flex-col items-center justify-center relative">
                     {product.thumbnailUrl ? (
                       <img 
                         src={`${UPLOADS_URL}/${product.thumbnailUrl}`} 
@@ -126,15 +93,23 @@ export const HomePage: React.FC = () => {
                     ) : (
                       <FallbackImage size={40} />
                     )}
+                    {/* 상태 뱃지 오버레이 */}
+                    {product.status !== 'SALE' && (
+                      <div className="absolute top-0 left-0 w-full h-full bg-black/40 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold px-2 py-1 bg-black/60 rounded">
+                          {product.status === 'RESERVED' ? '예약중' : '거래완료'}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* 상품 정보 */}
                   <div className="ml-[26px] h-[112px] flex flex-col justify-start pt-[5px] flex-1 overflow-hidden">
-                    <div className="flex items-center gap-1.5 mb-1 overflow-hidden">
-                      {product.status === 'RESERVED' && <span className="bg-[#4CAF50] text-white text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0">예약중</span>}
-                      {product.status === 'SOLD' && <span className="bg-[#8E8E93] text-white text-[11px] font-bold px-1.5 py-0.5 rounded shrink-0">거래완료</span>}
-                      <h2 className="text-[16px] text-black font-light leading-none truncate flex-1">{product.title}</h2>
-                    </div>
+                    <h2 className="text-[16px] text-black font-light leading-none truncate">
+                        {product.status === 'RESERVED' && <span className="text-white bg-green-500 rounded px-1.5 py-0.5 text-xs mr-1 align-middle">예약중</span>}
+                        {product.status === 'SOLD' && <span className="text-white bg-gray-500 rounded px-1.5 py-0.5 text-xs mr-1 align-middle">거래완료</span>}
+                        {product.title}
+                    </h2>
                     
                     <div className="flex items-center text-[12px] text-gray-400 font-light mt-[10px]">
                       <span>{product.location || '비산동'}</span>
@@ -151,14 +126,6 @@ export const HomePage: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* 글쓰기 플로팅 버튼 (FAB) */}
-        <button 
-          className="absolute right-[20px] bottom-[24px] w-[80px] h-[80px] bg-orange-500 rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600 transition-colors z-[60]"
-          onClick={() => navigate('/write')}
-        >
-          <Plus size={40} className="text-white" strokeWidth={2.5} />
-        </button>
       </div>
     </div>
   );

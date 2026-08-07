@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/carrot
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/carrot}
     driver-class-name: org.postgresql.Driver
-    username: yongwon
-    password: 
+    username: ${SPRING_DATASOURCE_USERNAME:yongwon}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

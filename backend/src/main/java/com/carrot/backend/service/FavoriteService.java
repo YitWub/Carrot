@@ -4,6 +4,7 @@ import com.carrot.backend.domain.Favorite;
 import com.carrot.backend.domain.Product;
 import com.carrot.backend.domain.User;
 import com.carrot.backend.dto.FavoriteResponse;
+import com.carrot.backend.dto.ProductListResponse;
 import com.carrot.backend.repository.FavoriteRepository;
 import com.carrot.backend.repository.ProductRepository;
 import com.carrot.backend.repository.UserRepository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoriteService {
@@ -64,5 +67,32 @@ public class FavoriteService {
         }
 
         return new FavoriteResponse(productId, false, product.getFavoriteCount());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductListResponse> getMyFavorites(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        List<Favorite> favorites = favoriteRepository.findByUserOrderByCreatedAtDesc(user);
+
+        return favorites.stream().map(favorite -> {
+            Product product = favorite.getProduct();
+            String thumbnailUrl = null;
+            if (product.getImages() != null && !product.getImages().isEmpty()) {
+                thumbnailUrl = product.getImages().get(0).getImageUrl();
+            }
+
+            return new ProductListResponse(
+                    product.getId(),
+                    product.getTitle(),
+                    product.getPrice(),
+                    product.getStatus(),
+                    thumbnailUrl,
+                    product.getLocation(),
+                    product.getSeller() != null ? product.getSeller().getNickname() : "알 수 없음",
+                    product.getCreatedAt()
+            );
+        }).collect(Collectors.toList());
     }
 }

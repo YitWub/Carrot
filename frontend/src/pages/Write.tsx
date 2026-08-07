@@ -1,16 +1,49 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, Camera, X } from 'lucide-react';
-import { apiClient } from '../api/client';
+import { apiClient, UPLOADS_URL } from '../api/client';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function Write() {
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
+    const [location, setLocation] = useState('비산동');
     const [content, setContent] = useState('');
     const [images, setImages] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    
+    const [searchParams] = useSearchParams();
+    const editId = searchParams.get('edit');
 
     const navigate = useNavigate();
+    const user = useAuthStore(state => state.user);
+    const myUserId = user?.userId;
+
+    useEffect(() => {
+        if (editId && myUserId) {
+            apiClient.get(`/api/v1/products/${editId}`, {
+                headers: { 'X-User-Id': myUserId }
+            }).then(res => {
+                const data = res.data;
+                if (data.sellerId !== myUserId) {
+                    alert('수정 권한이 없습니다.');
+                    navigate(-1);
+                    return;
+                }
+                setTitle(data.title);
+                setPrice(data.price.toString());
+                setLocation(data.location || '비산동');
+                setContent(data.content);
+                if (data.imageUrls && data.imageUrls.length > 0) {
+                    setPreviewUrls(data.imageUrls.map((url: string) => `${UPLOADS_URL}/${url}`));
+                }
+            }).catch(err => {
+                console.error(err);
+                alert('상품 정보를 불러오지 못했습니다.');
+                navigate(-1);
+            });
+        }
+    }, [editId, myUserId, navigate]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -21,7 +54,13 @@ export default function Write() {
 
             // 미리보기 URL 생성
             const newPreviewUrls = newImages.map(file => URL.createObjectURL(file));
-            setPreviewUrls(newPreviewUrls);
+            // 기존 URL과 합치기 (수정 모드에서는 새 이미지를 지원하지 않으므로 덮어쓰기)
+            if (editId) {
+                alert('현재 수정 시 기존 이미지를 유지하거나 새 이미지로 완전히 교체할 수 있습니다. 이미지는 저장 시 새 파일만 등록됩니다. (본문/제목/가격 우선 수정)');
+                setPreviewUrls(newPreviewUrls);
+            } else {
+                setPreviewUrls(newPreviewUrls);
+            }
         }
     };
 
@@ -31,7 +70,9 @@ export default function Write() {
         setImages(newImages);
 
         const newPreviewUrls = [...previewUrls];
-        URL.revokeObjectURL(newPreviewUrls[index]);
+        if (newPreviewUrls[index].startsWith('blob:')) {
+            URL.revokeObjectURL(newPreviewUrls[index]);
+        }
         newPreviewUrls.splice(index, 1);
         setPreviewUrls(newPreviewUrls);
     };
@@ -39,7 +80,6 @@ export default function Write() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const myUserId = localStorage.getItem("userId");
         if (!myUserId) {
             alert("로그인이 필요합니다.");
             navigate('/login');
@@ -51,11 +91,31 @@ export default function Write() {
             return;
         }
 
+        if (editId) {
+            try {
+                await apiClient.put(`/api/v1/products/${editId}`, {
+                    title,
+                    price: price ? Number(price) : 0,
+                    location,
+                    content
+                }, {
+                    headers: { 'X-User-Id': myUserId }
+                });
+                alert('글이 성공적으로 수정되었어요!');
+                navigate(`/product/${editId}`);
+            } catch (error) {
+                console.error(error);
+                alert('수정에 실패했습니다.');
+            }
+            return;
+        }
+
         const formData = new FormData();
         formData.append("title", title);
         formData.append("price", price || "0");
+        formData.append("location", location);
         formData.append("content", content);
-        formData.append("sellerId", myUserId);
+        formData.append("sellerId", myUserId.toString());
         
         images.forEach(image => {
             formData.append("images", image); // 백엔드 다중 이미지 키에 맞춤
@@ -159,6 +219,26 @@ export default function Write() {
                                 min="0"
                                 onChange={(e) => setPrice(e.target.value)}
                             />
+                        </div>
+
+                        {/* 위치(지역) */}
+                        <div>
+                            <label className="text-[13px] font-bold text-black mb-2 block">거래 희망 장소 (지역)</label>
+                            <select
+                                className="w-full h-[43px] bg-[#ECECEC] rounded-[5px] px-3 text-[14px] focus:outline-none text-black appearance-none"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                                required
+                            >
+                                <option value="비산동">비산동</option>
+                                <option value="관양동">관양동</option>
+                                <option value="평촌동">평촌동</option>
+                                <option value="호계동">호계동</option>
+                                <option value="범계동">범계동</option>
+                                <option value="안양동">안양동</option>
+                                <option value="석수동">석수동</option>
+                                <option value="박달동">박달동</option>
+                            </select>
                         </div>
                     </div>
                 </form>

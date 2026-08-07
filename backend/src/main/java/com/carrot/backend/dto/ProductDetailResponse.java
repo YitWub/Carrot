@@ -9,10 +9,14 @@ public record ProductDetailResponse(
     String content,
     Integer price,
     String status,
+    String location,
     Long sellerId,
     String sellerNickname,
     String sellerProfileImageUrl,
     Double sellerMannerTemp,
     List<String> imageUrls,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    Integer favoriteCount,
+    Integer viewCount,
+    Boolean isFavorite
 ) {}

@@ -1,16 +1,16 @@
 package com.carrot.backend.dto;
 
-import java.time.LocalDateTime;
-
-public record ChatRoomListResponse(
+public record ChatRoomDetailResponse(
     Long roomId,
     Long productId,
     String productTitle,
+    Integer productPrice,
     String productThumbnailUrl,
     Long partnerId,
     String partnerNickname,
     String partnerProfileImageUrl,
-    String lastMessage,
-    LocalDateTime lastMessageTime,
-    int unreadCount
+    Double partnerMannerTemp,
+    boolean isProductSold,
+    boolean isSeller,
+    boolean hasReviewed
 ) {}

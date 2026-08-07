@@ -26,8 +26,10 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductListResponse>> showProductList(
-            @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(productService.getAllProducts(pageable));
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId,
+            @RequestParam(required = false) String keyword) {
+        return ResponseEntity.ok(productService.getAllProducts(pageable, userId, keyword));
     }
 
     @PostMapping
@@ -36,9 +38,10 @@ public class ProductController {
             @RequestParam String title,
             @RequestParam String content,
             @RequestParam Integer price,
+            @RequestParam(required = false) String location,
             @RequestParam(required = false) List<MultipartFile> images) {
         try {
-            ProductCreateResponse response = productService.createProduct(title, content, price, sellerId, images);
+            ProductCreateResponse response = productService.createProduct(title, content, price, sellerId, images, location);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -48,9 +51,11 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetailResponse> getProduct(@PathVariable Long id) {
+    public ResponseEntity<ProductDetailResponse> getProduct(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
         try {
-            return ResponseEntity.ok(productService.getProductDetail(id));
+            return ResponseEntity.ok(productService.getProductDetail(id, userId));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

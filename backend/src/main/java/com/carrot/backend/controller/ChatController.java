@@ -60,6 +60,20 @@ public class ChatController {
         }
     }
 
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<?> getRoomDetail(
+            @PathVariable Long roomId,
+            @RequestHeader("X-User-Id") Long userId) {
+        try {
+            ChatRoomDetailResponse response = chatService.getRoomDetail(roomId, userId);
+            return ResponseEntity.ok(response);
+        } catch (com.carrot.backend.exception.UnauthorizedAccessException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/my-rooms")
     public ResponseEntity<List<ChatRoomListResponse>> getMyRooms(
             @RequestHeader("X-User-Id") Long userId) {
@@ -75,6 +89,27 @@ public class ChatController {
             return ResponseEntity.ok().build();
         } catch (com.carrot.backend.exception.UnauthorizedAccessException e) {
             return ResponseEntity.status(403).build();
+        }
+    }
+
+    @GetMapping("/unread-count")
+    public ResponseEntity<java.util.Map<String, Integer>> getUnreadCount(
+            @RequestHeader("X-User-Id") Long userId) {
+        int count = chatService.getUnreadCount(userId);
+        return ResponseEntity.ok(java.util.Map.of("count", count));
+    }
+
+    @PostMapping("/rooms/{roomId}/complete")
+    public ResponseEntity<Void> completeChatRoom(
+            @PathVariable Long roomId,
+            @RequestHeader("X-User-Id") Long userId) {
+        try {
+            chatService.completeChatRoom(roomId, userId);
+            return ResponseEntity.ok().build();
+        } catch (com.carrot.backend.exception.UnauthorizedAccessException e) {
+            return ResponseEntity.status(403).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).build();
         }
     }
 }
