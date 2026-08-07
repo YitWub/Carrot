@@ -20,7 +20,11 @@ public class Product {
     
     private Integer price;
 
-    private String status = "SALE"; // SALE, RESERVED, SOLD
+    @Column(nullable = false)
+    private String status = "SALE"; // SALE, RESERVED, SOLD, DELETED
+
+    @Column(nullable = false, columnDefinition = "varchar(255) default '비산동'")
+    private String location = "비산동"; // Default location
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,7 +51,17 @@ public class Product {
     public void setPrice(Integer price) { this.price = price; }
     
     public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public User getSeller() { return seller; }
     public void setSeller(User seller) { this.seller = seller; }
@@ -62,9 +76,17 @@ public class Product {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     private int favoriteCount = 0;
+    private int viewCount = 0;
 
     public int getFavoriteCount() { return favoriteCount; }
     public void setFavoriteCount(int favoriteCount) { this.favoriteCount = favoriteCount; }
+
+    public int getViewCount() { return viewCount; }
+    public void setViewCount(int viewCount) { this.viewCount = viewCount; }
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
 
     public void increaseFavoriteCount() {
         this.favoriteCount++;

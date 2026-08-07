@@ -8,6 +8,7 @@ public record ProductListResponse(
     Integer price,
     String status,
     String thumbnailUrl,
+    String location,
     String sellerNickname,
     LocalDateTime createdAt
 ) {}

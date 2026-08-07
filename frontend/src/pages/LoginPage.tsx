@@ -4,7 +4,7 @@ import { auth } from '../firebase';
 import { apiClient } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, MapPin, ShieldCheck, MessageCircle, Heart } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);

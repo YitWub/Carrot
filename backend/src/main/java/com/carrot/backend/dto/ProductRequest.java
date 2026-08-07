@@ -5,6 +5,15 @@ public class ProductRequest {
     private String content;
     private Integer price;
     private Long sellerId;
+    private String location;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public Long getSellerId() {
         return sellerId;

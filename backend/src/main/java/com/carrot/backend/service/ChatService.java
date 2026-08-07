@@ -16,13 +16,16 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     public ChatService(ChatRoomRepository chatRoomRepository, ChatMessageRepository chatMessageRepository, 
-                       ProductRepository productRepository, UserRepository userRepository) {
+                       ProductRepository productRepository, UserRepository userRepository,
+                       ReviewRepository reviewRepository) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     private void validateRoomParticipant(ChatRoom room, Long userId) {
@@ -73,12 +76,18 @@ public class ChatService {
         return new ChatMessageResponse(savedMsg.getId(), sender.getId(), savedMsg.getMessage(), savedMsg.getIsRead(), savedMsg.getCreatedAt());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ChatMessageResponse> getMessages(Long roomId, Long userId) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow();
+        User currentUser = userRepository.findById(userId).orElseThrow();
         
         validateRoomParticipant(room, userId);
+
+        // 사용자가 채팅방에서 메시지를 조회하면, 상대방이 보낸 메시지 중 안 읽은 것이 있을 때만 읽음 처리
+        int unreadCount = chatMessageRepository.countUnreadInRoom(room.getId(), userId);
+        if (unreadCount > 0) {
+            chatMessageRepository.markMessagesAsRead(room, userId);
+        }
 
         return chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room).stream()
                 .map(msg -> new ChatMessageResponse(msg.getId(), msg.getSender().getId(), msg.getMessage(), msg.getIsRead(), msg.getCreatedAt()))
@@ -89,7 +98,7 @@ public class ChatService {
     public List<ChatRoomListResponse> getMyRooms(Long userId) {
         List<ChatRoom> rooms = chatRoomRepository.findByBuyerIdOrProductSellerId(userId, userId);
 
-        return rooms.stream().map(room -> {
+        List<ChatRoomListResponse> responseList = rooms.stream().map(room -> {
             boolean isBuyer = room.getBuyer().getId().equals(userId);
             User partner = isBuyer ? room.getProduct().getSeller() : room.getBuyer();
 
@@ -102,6 +111,9 @@ public class ChatService {
             String lastMessage = lastMessageOpt.map(ChatMessage::getMessage).orElse("");
             java.time.LocalDateTime lastMessageTime = lastMessageOpt.map(ChatMessage::getCreatedAt).orElse(null);
 
+            User currentUser = userRepository.findById(userId).orElseThrow();
+            int unreadCount = chatMessageRepository.countUnreadInRoom(room.getId(), userId);
+
             return new ChatRoomListResponse(
                     room.getId(),
                     room.getProduct().getId(),
@@ -111,9 +123,24 @@ public class ChatService {
                     partner.getNickname(),
                     partner.getProfileImageUrl(),
                     lastMessage,
-                    lastMessageTime
+                    lastMessageTime,
+                    unreadCount
             );
         }).collect(Collectors.toList());
+
+        responseList.sort((r1, r2) -> {
+            if (r1.lastMessageTime() == null && r2.lastMessageTime() == null) return 0;
+            if (r1.lastMessageTime() == null) return 1;
+            if (r2.lastMessageTime() == null) return -1;
+            return r2.lastMessageTime().compareTo(r1.lastMessageTime());
+        });
+
+        return responseList;
+    }
+
+    @Transactional(readOnly = true)
+    public int getUnreadCount(Long userId) {
+        return chatMessageRepository.countUnreadMessages(userId);
     }
 
     @Transactional
@@ -123,6 +150,56 @@ public class ChatService {
         
         validateRoomParticipant(room, userId);
         
-        chatMessageRepository.markMessagesAsRead(room, currentUser);
+        chatMessageRepository.markMessagesAsRead(room, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoomDetailResponse getRoomDetail(Long roomId, Long userId) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+        
+        validateRoomParticipant(room, userId);
+
+        boolean isBuyer = room.getBuyer().getId().equals(userId);
+        User partner = isBuyer ? room.getProduct().getSeller() : room.getBuyer();
+
+        String thumbnailUrl = null;
+        if (room.getProduct().getImages() != null && !room.getProduct().getImages().isEmpty()) {
+            thumbnailUrl = room.getProduct().getImages().get(0).getImageUrl();
+        }
+
+        boolean isProductSold = "SOLD".equals(room.getProduct().getStatus());
+        boolean isSeller = room.getProduct().getSeller().getId().equals(userId);
+        
+        User currentUser = userRepository.findById(userId).orElseThrow();
+        boolean hasReviewed = reviewRepository.existsByReviewerAndProduct(currentUser, room.getProduct());
+
+        return new ChatRoomDetailResponse(
+                room.getId(),
+                room.getProduct().getId(),
+                room.getProduct().getTitle(),
+                room.getProduct().getPrice(),
+                thumbnailUrl,
+                partner.getId(),
+                partner.getNickname(),
+                partner.getProfileImageUrl(),
+                partner.getMannerTemp(),
+                isProductSold,
+                isSeller,
+                hasReviewed
+        );
+    }
+
+    @Transactional
+    public void completeChatRoom(Long roomId, Long userId) {
+        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다."));
+        
+        if (!room.getProduct().getSeller().getId().equals(userId)) {
+            throw new UnauthorizedAccessException("판매자만 거래를 완료할 수 있습니다.");
+        }
+
+        Product product = room.getProduct();
+        product.setStatus("SOLD");
+        productRepository.save(product);
     }
 }

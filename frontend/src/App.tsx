@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { MyPage } from './pages/MyPage';
@@ -8,17 +7,24 @@ import { useAuthStore } from './store/useAuthStore';
 import { HomePage } from './pages/HomePage';
 import ProductDetail from './pages/ProductDetail';
 import Write from './pages/Write';
-
-// 임시 채팅 페이지
-const ChatPage = () => (
-  <div className="p-4">
-    <h1 className="text-2xl font-bold mb-4">채팅</h1>
-    <p>채팅 리스트 구현 예정...</p>
-  </div>
-);
+import ChatDetail from './pages/ChatDetail';
+import { FavoriteListPage } from './pages/FavoriteListPage';
+import { MyProductsPage } from './pages/MyProductsPage';
+import ChatPage from './pages/ChatPage';
+import { useMaintenanceStore } from './store/useMaintenanceStore';
+import MaintenanceScreen from './components/MaintenanceScreen';
 
 function App() {
   const { isLoggedIn } = useAuthStore();
+  const isMaintenance = useMaintenanceStore((state) => state.isMaintenance);
+
+  if (isMaintenance) {
+    return (
+      <div className="mx-auto w-full max-w-[480px] h-screen bg-white shadow-2xl overflow-hidden relative flex flex-col">
+        <MaintenanceScreen />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[480px] h-screen bg-white shadow-2xl overflow-hidden relative flex flex-col">
@@ -44,6 +50,9 @@ function App() {
 
         <Route path="/product/:id" element={isLoggedIn ? <ProductDetail /> : <Navigate to="/login" replace />} />
         <Route path="/write" element={isLoggedIn ? <Write /> : <Navigate to="/login" replace />} />
+        <Route path="/chat/:roomId" element={isLoggedIn ? <ChatDetail /> : <Navigate to="/login" replace />} />
+        <Route path="/my/favorites" element={isLoggedIn ? <FavoriteListPage /> : <Navigate to="/login" replace />} />
+        <Route path="/my/products" element={isLoggedIn ? <MyProductsPage /> : <Navigate to="/login" replace />} />
 
         {/* 알 수 없는 경로는 홈으로 리다이렉트 */}
         <Route path="*" element={<Navigate to="/" replace />} />
