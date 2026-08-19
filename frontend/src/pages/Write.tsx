@@ -129,9 +129,10 @@ export default function Write() {
             });
             alert('글을 성공적으로 올렸어요!');
             navigate('/');
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('앗! 글 작성에 실패했어요.');
+            const serverMessage = typeof error?.response?.data === 'string' ? error.response.data : null;
+            alert(serverMessage || '앗! 글 작성에 실패했어요.');
         }
     };
 

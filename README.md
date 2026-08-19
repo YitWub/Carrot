@@ -130,6 +130,9 @@ pg_dump -U yongwon -d carrot -f carrot_backup.sql
        listen 80;
        server_name yongwon.duckdns.org; # 본인의 DuckDNS 도메인 주소
 
+       # 모바일 카메라 사진 등 대용량 업로드 허용 (기본값 1m이라 게시물 업로드 실패의 원인이 됨)
+       client_max_body_size 50m;
+
        # 1. 프론트엔드 서빙
        location / {
            root /var/www/html;
@@ -157,6 +160,17 @@ pg_dump -U yongwon -d carrot -f carrot_backup.sql
        # 2. 백엔드 API 요청 리버스 프록시
        location /api/ {
            proxy_pass http://localhost:9000; # 실행 중인 스프링 부트 서버 포트
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+
+       # 3. 업로드된 상품/프로필 이미지 리버스 프록시
+       # (파일이 프론트 정적 폴더가 아니라 백엔드 uploads 디렉토리에 저장되므로 반드시 필요.
+       #  ^~ 로 위의 확장자 정규식 location보다 우선 매칭되도록 고정)
+       location ^~ /uploads/ {
+           proxy_pass http://localhost:9000/uploads/;
            proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
